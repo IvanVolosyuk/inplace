@@ -80,23 +80,29 @@ void compare_and_write(int fd, char *buf, size_t size) {
 }
 
 int main(int argc, char **argv) {
-  if (argc < 2) {
+  if (argc != 3) {
     fprintf(stderr,
-            "Usage: %s dest_file <src_file\n"
+            "Usage: %s src_file dest_file\n"
             "The destination should already exist and be the same size "
             "as source.\n",
             argv[0]);
     exit(1);
   }
 
-  int dest = open(argv[1], O_RDWR);
+  int src = open(argv[1], O_RDONLY);
+  if (src == -1) {
+    perror("Failed to open src");
+    exit(1);
+  }
+
+  int dest = open(argv[2], O_RDWR);
   if (dest == -1) {
-    perror("Failed to open destionation");
+    perror("Failed to open dest");
     exit(1);
   }
 
   while (true) {
-    ssize_t rd = readfully(0, srcbuf, sizeof(srcbuf), "Failed to read stdin");
+    ssize_t rd = readfully(src, srcbuf, sizeof(srcbuf), "Failed to read stdin");
 
     if (rd == 0) {
       print_stats();

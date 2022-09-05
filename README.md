@@ -2,7 +2,7 @@
 Simple tool to copy a file inplace writing only modified blocks.
 
 Usage:
-```inplace dst_file <src_file```
+```inplace src_file dst_file```
 
 Both files should already exist and be of the same size. The tool
 doesn't make sense in a general case and ```cp src_file dst_file```
