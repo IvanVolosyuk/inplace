@@ -1,9 +1,9 @@
+#include <fcntl.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <fcntl.h>
 #include <unistd.h>
-#include <stdbool.h>
 
 #define BLOCKSIZE (128 * 1024)
 
@@ -13,33 +13,25 @@ char srcbuf[BLOCKSIZE];
 char dstbuf[BLOCKSIZE];
 
 void print_stats() {
-  printf("Changed bytes %ld (%ld blocks), unchanged %ld (%ld blocks), changed percent %lu\n",
-      modified * BLOCKSIZE, modified, unchanged * BLOCKSIZE, unchanged,
-      modified * 100 / (modified + unchanged));
+  printf("Changed bytes %ld (%ld blocks), unchanged %ld (%ld blocks), changed "
+         "percent %lu\n",
+         modified * BLOCKSIZE, modified, unchanged * BLOCKSIZE, unchanged,
+         modified * 100 / (modified + unchanged));
 }
 
-void fail_with_perror(const char* message) {
+void fail_with_perror(const char *message) {
   print_stats();
   perror(message);
   exit(1);
 }
 
-void fail_with_message(const char* message) {
+void fail_with_message(const char *message) {
   print_stats();
   fprintf(stderr, "%s\n", message);
   exit(1);
 }
 
-void finish(int status) {
-  if (status == -1) {
-    perror("Failed to read");
-  }
-
-
-  exit(-status);
-}
-
-int readfully(int fd, char* buf, size_t size, const char* message) {
+int readfully(int fd, char *buf, size_t size, const char *message) {
   size_t rem = size;
 
   while (rem > 0) {
@@ -57,7 +49,7 @@ int readfully(int fd, char* buf, size_t size, const char* message) {
   return size - rem;
 }
 
-void compare_and_write(int fd, char* buf, size_t size) {
+void compare_and_write(int fd, char *buf, size_t size) {
   int rd = readfully(fd, dstbuf, size, "Failed to read destination");
 
   if (rd != size) {
@@ -74,11 +66,11 @@ void compare_and_write(int fd, char* buf, size_t size) {
   if (match) {
     unchanged++;
     return;
-  } 
+  }
   modified++;
 
   int res = lseek(fd, -BLOCKSIZE, SEEK_CUR);
-  if (res == (off_t) -1) {
+  if (res == (off_t)-1) {
     fail_with_perror("Failed to seek destination");
   }
   res = write(fd, srcbuf, size);
@@ -87,11 +79,13 @@ void compare_and_write(int fd, char* buf, size_t size) {
   }
 }
 
-int main(int argc, char**argv) {
+int main(int argc, char **argv) {
   if (argc < 2) {
-    fprintf(stderr, "Usage: %s dest_file <src_file\n"
-        "The destination should already exist and be the same size "
-        "as source.\n", argv[0]);
+    fprintf(stderr,
+            "Usage: %s dest_file <src_file\n"
+            "The destination should already exist and be the same size "
+            "as source.\n",
+            argv[0]);
     exit(1);
   }
 
